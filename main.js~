@@ -31,60 +31,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		} 						
 	};
 
-
-
-
-
-
-
-
-
-
-
-	
-
-
-/*   
-    setInterval(function(){ 
-		var elements = document.getElementsByClassName("_5jmm _5pat _3lb4 _x72 _50nb");
-		//var elements = document.getElementsByClassName("UFILikeLink");
-		console.log("lenght: " + elements.length);
-		for(var i=0; i<elements.length; i++) {
-			console.log("element: " + elements[i].getAttribute('id'));
-		}
-	}, 3000);
-*/
-
-
-    //if(contentNode.addEventListener)
-		//contentNode.addEventListener('DOMNodeInsertedIntoDocument', OnNodeInsertedIntoDocument, false);
-	//var targetList = document.querySelectorAll('[id^="topnews_main_stream_"]');		
-
-/*
-    var likeLinks = document.getElementsByClassName("UFILikeLink")
-	for (var i=0; i<likeLinks.length; i++) {
-		likeLinks[i].addEventListener('click', clickHandler);
-	}
-*/
-	//var cc = document.getElementsByClassName("UFILikeLink");
-	//console.log(cc);
-
-/*
-	var insertedNodes = [];
-	var observer = new MutationObserver(function(mutations) {
-	     console.log("111");
-		 mutations.forEach(function(mutation) {
-			console.log("2222");
-		   for (var i = 0; i < mutation.addedNodes.length; i++) {
-			 console.log("33333333");	
-			 insertedNodes.push(mutation.addedNodes[i]);
-		   }
-		 });
-	});
-	observer.observe(document, { childList: true });
-	console.log("llllllll" + insertedNodes);
-*/
-
 });
 
 

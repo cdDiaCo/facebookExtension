@@ -12,6 +12,9 @@
 		{
 			"matches": ["*://www.facebook.com/*"],
    			"js": ["main.js"],
+			"css": [
+				"box.css"
+			],
             "run_at": "document_start" 		  
    		}
    ],
@@ -21,5 +24,10 @@
     "webRequestBlocking",
     "storage",
     "*://*.facebook.com/"  
-  ]
+  ],
+
+	"web_accessible_resources": [
+		"box.html"		
+	  ]
+
 }

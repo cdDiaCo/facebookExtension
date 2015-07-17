@@ -1,7 +1,12 @@
 (function() {
 console.log("in main............");
 
-var numOfLikes = 0;
+var likesLimit = 3;
+var numOfLikes;
+chrome.storage.local.get('likesGiven', function(result){
+	numOfLikes = (typeof result.likesGiven === "undefined") ? 0 : result.likesGiven ;	
+});
+
 
 document.addEventListener('DOMContentLoaded', function () {
     //console.log("in addeventlistener");
@@ -34,22 +39,26 @@ document.addEventListener('DOMContentLoaded', function () {
 				
 			likeBtns[i].className = likeClass + " hasOnClickListener";	 // mark this like btn by adding a new class to it		
 			likeBtns[i].onclick = function() {
-									console.log("in the handler");
-									numOfLikes += 1;		
-									likesGivenValue.innerHTML = numOfLikes; // update the likes given UI
-									chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
-									  console.log(response.farewell);
-									});									
+									console.log("in the handler");									
+									numOfLikes += 1;
+									// check if likesLimit is reached
+									// if this is the case notify the user and stop any other possible likes 				 
+									if (numOfLikes > likesLimit) {	
+										chrome.runtime.sendMessage({message: "stopLikeRequest"}, function(response) {
+									  		console.log(response.requestBlocked);
+										});	
+									} else if (numOfLikes === likesLimit) {
+										alert("you reached the likes limit for today");
+									} else {
+										chrome.storage.local.set({'likesGiven': numOfLikes});	
+										likesGivenValue.innerHTML = numOfLikes; // update the likes given UI
+									}																		
 								};
 			console.log("numOfLikes: " + numOfLikes);						
 		} 						
 	};
 
 });
-
-
-
-
 
 
 })();

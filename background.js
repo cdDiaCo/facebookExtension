@@ -11,9 +11,9 @@ chrome.runtime.onMessage.addListener(
     if (request.message == "stopLikeRequest") {
 		chrome.webRequest.onBeforeRequest.addListener( 	
 			function(info) {
-			console.log("onbeforereq");
-			//console.log("onBeforeRequest: " + JSON.stringify(info.requestBody.raw[0].bytes) );  
-			return {cancel: true};  
+				console.log("onbeforereq");
+				//console.log("onBeforeRequest: " + JSON.stringify(info.requestBody.raw[0].bytes) );  
+				return {cancel: true};  
 			},
 			// filters
 			{

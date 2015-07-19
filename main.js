@@ -2,24 +2,29 @@
 console.log("in main............");
 
 var today = getCurrentDate();
-
 var likesLimit = 3;
-var numOfLikes =2;
-var retrievedDate;
-
+var numOfLikesRetrieved;
+var timeSpentRetrieved;
+var newTime;
+var totalSecondsRetrieved = 0;
 var key = today + "";
 
-chrome.storage.local.get(key, function(result){
-	//console.log("nnnnnnnn " + JSON.stringify(result));
-	//console.log("nnnnnnnn " + result.date);
-	//retrievedDate = (typeof result.date === "undefined") ? today : result.date;
-	console.log("lll" + JSON.stringify(result));		
+chrome.storage.local.get(key, function(result){	
 	retrievedContent = result[key];
 	console.log(result[key]);
-	if(retrievedContent) {
-		console.log("fff " + retrievedContent.likesGiven);	
-		console.log("ddd " + retrievedContent.timeSpent);
+	
+	numOfLikesRetrieved = (typeof retrievedContent.likesGiven === 'undefined') ? 0 : retrievedContent.likesGiven ;
+	timeSpentRetrieved = (typeof retrievedContent.timeSpent === 'undefined') ? 0 : retrievedContent.timeSpent;
+	// if there is a valid timeSpentRetrieved start the timer from this value 
+	if(timeSpentRetrieved) {
+		totalSecondsRetrieved = stringToSeconds(timeSpentRetrieved);
 	}
+
+	if(numOfLikesRetrieved === likesLimit) {
+		chrome.runtime.sendMessage({message: "stopLikeRequest"}, function(response) {
+  			//console.log(response.requestBlocked);
+		});	
+	}		
 });
 
 document.addEventListener('DOMContentLoaded', function () {  
@@ -30,23 +35,29 @@ document.addEventListener('DOMContentLoaded', function () {
 	var likesGiven = document.createElement("span");
 	var likesGivenValue = document.createElement("span");
 	likesGivenValue.id = "lg_value";
-    likesGivenValue.innerHTML = numOfLikes;
+    likesGivenValue.innerHTML = numOfLikesRetrieved;
 	var likesText = document.createTextNode(" Likes given: ");
 
 	var timeSpent = document.createElement("span");
 	var timeSpentValue = document.createElement("span");
 	timeSpentValue.id = "ts_value";
+	timeSpentValue.innerHTML = timeSpentRetrieved;
 	var timeText = document.createTextNode("Time spent: ");
+
+	var br = document.createElement("br");
 
 	timeSpent.appendChild(timeText);
 	timeSpent.appendChild(timeSpentValue);
 	div.appendChild(timeSpent);
+
+	div.appendChild(br);
 
 	likesGiven.appendChild(likesText);
 	likesGiven.appendChild(likesGivenValue);
 	div.appendChild(likesGiven);	
 	document.body.appendChild(div);		
 
+	startTimer();
 	window.addEventListener('scroll', onScrollHandler);	
 });
 
@@ -73,27 +84,25 @@ function onScrollHandler() {
 }
 
 
-function likeClickHandler() {
-	console.log("in the like click handler");	
-	numOfLikes += 1;
+function likeClickHandler() {		
+	numOfLikesRetrieved += 1;
+
 	// check if likesLimit is reached
-	// if this is the case notify the user and stop any other possible likes 	
-	console.log('numOfLikes ' + numOfLikes);			 
-	if (numOfLikes > likesLimit) {			
+	// if this is the case notify the user and stop any other possible likes 				 
+	if (numOfLikesRetrieved > likesLimit) {			
 		chrome.runtime.sendMessage({message: "stopLikeRequest"}, function(response) {
 	  		console.log(response.requestBlocked);
 		});	
 	} else { 
-		if (numOfLikes === likesLimit) { 
+		if (numOfLikesRetrieved === likesLimit) { 
 			alert("you reached the likes limit for today"); 				
-		}	
-		console.log("today " + today);
+		}			
 		//chrome.storage.local.set({'likesGiven': numOfLikes, 'likesGivenDate': today});
 		var key = today + "";
 		var obj = {};
-		obj[key] = {'likesGiven': numOfLikes, 'timeSpent': 2};
+		obj[key] = {'likesGiven': numOfLikesRetrieved, 'timeSpent': newTime};
 		chrome.storage.local.set(obj);	    
-		document.getElementById('lg_value').innerHTML = numOfLikes; // update the likes given UI
+		document.getElementById('lg_value').innerHTML = numOfLikesRetrieved; // update the likes given UI
 	}
 }
 
@@ -118,6 +127,41 @@ function getCurrentDate() {
 }
 
 
+function startTimer() {
+	var seconds = totalSecondsRetrieved ? totalSecondsRetrieved : 0;
+	var id = setInterval(addSecond, 1000);
+
+	function addSecond() {		
+		seconds++;
+		var secs = seconds;	
+		hours = Math.floor(secs/3600);	
+		secs %= 3600;
+		minutes = Math.floor(secs/60);
+		secs %= 60;
+		newTime = ( hours < 10 ? "0" : "" ) + hours + ":" 
+					+ ( minutes < 10 ? "0" : "" ) + minutes + ":" 
+					+ (secs < 10 ? "0" : "") + secs;	
+
+		document.getElementById("ts_value").innerHTML = newTime;
+		var key = today + "";
+		var obj = {};
+		var likes = document.getElementById('lg_value').innerHTML;
+		obj[key] = {'likesGiven': likes, 'timeSpent': newTime};
+		chrome.storage.local.set(obj);	    
+	}
+}
+
+// convert the time retrieved from the local storage to seconds
+function stringToSeconds(timeString) {
+	var res = timeString.split(":");
+	var hours = parseInt(res[0]) * 3600;
+	var minutes = parseInt(res[1]) * 60;
+	var seconds = parseInt(res[2]);
+	var totalSeconds = hours + minutes + seconds;	 
+	//console.log("hours " + hours + "minutes " + minutes + "seconds " + seconds);
+	return totalSeconds;
+
+}
 
 
 

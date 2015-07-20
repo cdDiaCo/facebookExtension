@@ -40,6 +40,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	var likesGivenValue = document.createElement("span");
 	likesGivenValue.id = "lg_value";
     likesGivenValue.innerHTML = numOfLikesRetrieved;
+	likesLimitValue = document.createElement("span");	
+	likesLimitValue.id = "likes_limit";
+	likesLimitValue.innerHTML = " / " + likesLimit;
 	var likesText = document.createTextNode(" Likes given: ");
 
 	var timeSpent = document.createElement("span");
@@ -58,6 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	likesGiven.appendChild(likesText);
 	likesGiven.appendChild(likesGivenValue);
+	likesGiven.appendChild(likesLimitValue);
 	div.appendChild(likesGiven);	
 	document.body.appendChild(div);		
 
@@ -137,24 +141,34 @@ function startTimer() {
 	var seconds = totalSecondsRetrieved ? totalSecondsRetrieved : 0;
 	var id = setInterval(addSecond, 1000);
 
-	function addSecond() {		
-		seconds++;
-		var secs = seconds;	
-		hours = Math.floor(secs/3600);	
-		secs %= 3600;
-		minutes = Math.floor(secs/60);
-		secs %= 60;
-		newTime = ( hours < 10 ? "0" : "" ) + hours + ":" 
-					+ ( minutes < 10 ? "0" : "" ) + minutes + ":" 
-					+ (secs < 10 ? "0" : "") + secs;	
+	function addSecond() {	
+		// check if facebook tab is active
+		chrome.runtime.sendMessage({message: "is_facebookTabActive"}, function(response) {
+			console.log(JSON.stringify(response));
+		    if(response.isActive) {				
+		        seconds++;
+				var secs = seconds;	
+				hours = Math.floor(secs/3600);	
+				secs %= 3600;
+				minutes = Math.floor(secs/60);
+				secs %= 60;
+				newTime = ( hours < 10 ? "0" : "" ) + hours + ":" 
+							+ ( minutes < 10 ? "0" : "" ) + minutes + ":" 
+							+ (secs < 10 ? "0" : "") + secs;	
 
-		document.getElementById("ts_value").innerHTML = newTime;
-		var key = today + "";
-		//var key = "2015-07-21";
-		var obj = {};
-		var likes = parseInt(document.getElementById('lg_value').innerHTML);
-		obj[key] = {'likesGiven': likes, 'timeSpent': newTime};
-		chrome.storage.local.set(obj);	    
+				document.getElementById("ts_value").innerHTML = newTime;
+				var key = today + "";
+				//var key = "2015-07-21";
+				var obj = {};
+				var likes = parseInt(document.getElementById('lg_value').innerHTML);
+				obj[key] = {'likesGiven': likes, 'timeSpent': newTime};
+				chrome.storage.local.set(obj);	   
+		    } else {
+				console.log("is not active");
+		        //not in focus
+		    }
+    	});	
+		 
 	}
 }
 

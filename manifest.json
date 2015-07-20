@@ -23,7 +23,8 @@
     "webRequest",
     "webRequestBlocking",
     "storage",
-    "*://*.facebook.com/"  
+    "*://*.facebook.com/",
+	"tabs"  
   ],
 
 	"web_accessible_resources": [

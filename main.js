@@ -15,7 +15,7 @@ chrome.storage.local.get(key, function(result){
 	console.log(result[key]);
 	
 	if(typeof retrievedContent !== 'undefined') {		
-		numOfLikesRetrieved = retrievedContent.likesGiven;
+		numOfLikesRetrieved = parseInt(retrievedContent.likesGiven);
 		timeSpentRetrieved = retrievedContent.timeSpent;
 	}
 
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	var likesGiven = document.createElement("span");
 	var likesGivenValue = document.createElement("span");
 	likesGivenValue.id = "lg_value";
-    likesGivenValue.innerHTML = (typeof numOfLikesRetrieved === 'undefined') ? 0 : numOfLikesRetrieved;
+    likesGivenValue.innerHTML = numOfLikesRetrieved;
 	var likesText = document.createTextNode(" Likes given: ");
 
 	var timeSpent = document.createElement("span");
@@ -109,6 +109,7 @@ function likeClickHandler() {
 		chrome.storage.local.set(obj);	    
 		document.getElementById('lg_value').innerHTML = numOfLikesRetrieved; // update the likes given UI
 	}
+	console.log("num of likes: " + numOfLikesRetrieved);
 }
 
 
@@ -151,7 +152,7 @@ function startTimer() {
 		var key = today + "";
 		//var key = "2015-07-21";
 		var obj = {};
-		var likes = (typeof document.getElementById('lg_value').innerHTML === 'undefined') ? 0 : document.getElementById('lg_value').innerHTML;
+		var likes = parseInt(document.getElementById('lg_value').innerHTML);
 		obj[key] = {'likesGiven': likes, 'timeSpent': newTime};
 		chrome.storage.local.set(obj);	    
 	}

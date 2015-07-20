@@ -3,18 +3,22 @@ console.log("in main............");
 
 var today = getCurrentDate();
 var likesLimit = 3;
-var numOfLikesRetrieved;
-var timeSpentRetrieved;
+var numOfLikesRetrieved = 0;
+var timeSpentRetrieved = 0;
 var newTime;
 var totalSecondsRetrieved = 0;
 var key = today + "";
+//var key = "2015-07-21";
 
 chrome.storage.local.get(key, function(result){	
 	retrievedContent = result[key];
 	console.log(result[key]);
 	
-	numOfLikesRetrieved = (typeof retrievedContent.likesGiven === 'undefined') ? 0 : retrievedContent.likesGiven ;
-	timeSpentRetrieved = (typeof retrievedContent.timeSpent === 'undefined') ? 0 : retrievedContent.timeSpent;
+	if(typeof retrievedContent !== 'undefined') {		
+		numOfLikesRetrieved = retrievedContent.likesGiven;
+		timeSpentRetrieved = retrievedContent.timeSpent;
+	}
+
 	// if there is a valid timeSpentRetrieved start the timer from this value 
 	if(timeSpentRetrieved) {
 		totalSecondsRetrieved = stringToSeconds(timeSpentRetrieved);
@@ -35,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	var likesGiven = document.createElement("span");
 	var likesGivenValue = document.createElement("span");
 	likesGivenValue.id = "lg_value";
-    likesGivenValue.innerHTML = numOfLikesRetrieved;
+    likesGivenValue.innerHTML = (typeof numOfLikesRetrieved === 'undefined') ? 0 : numOfLikesRetrieved;
 	var likesText = document.createTextNode(" Likes given: ");
 
 	var timeSpent = document.createElement("span");
@@ -99,6 +103,7 @@ function likeClickHandler() {
 		}			
 		//chrome.storage.local.set({'likesGiven': numOfLikes, 'likesGivenDate': today});
 		var key = today + "";
+		//var key = "2015-07-21";
 		var obj = {};
 		obj[key] = {'likesGiven': numOfLikesRetrieved, 'timeSpent': newTime};
 		chrome.storage.local.set(obj);	    
@@ -144,8 +149,9 @@ function startTimer() {
 
 		document.getElementById("ts_value").innerHTML = newTime;
 		var key = today + "";
+		//var key = "2015-07-21";
 		var obj = {};
-		var likes = document.getElementById('lg_value').innerHTML;
+		var likes = (typeof document.getElementById('lg_value').innerHTML === 'undefined') ? 0 : document.getElementById('lg_value').innerHTML;
 		obj[key] = {'likesGiven': likes, 'timeSpent': newTime};
 		chrome.storage.local.set(obj);	    
 	}

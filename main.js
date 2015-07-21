@@ -2,13 +2,13 @@
 console.log("in main............");
 
 var today = getCurrentDate();
-var likesLimit = 3;
+var likesLimit = 2;
 var numOfLikesRetrieved = 0;
 var timeSpentRetrieved = 0;
 var newTime;
 var totalSecondsRetrieved = 0;
 var key = today + "";
-//var key = "2015-07-21";
+//var key = "2015-07-20";
 
 chrome.storage.local.get(key, function(result){	
 	retrievedContent = result[key];
@@ -17,6 +17,9 @@ chrome.storage.local.get(key, function(result){
 	if(typeof retrievedContent !== 'undefined') {		
 		numOfLikesRetrieved = parseInt(retrievedContent.likesGiven);
 		timeSpentRetrieved = retrievedContent.timeSpent;
+
+		chrome.storage.local.remove("2015-07-20");
+		//chrome.storage.local.clear();
 	}
 
 	// if there is a valid timeSpentRetrieved start the timer from this value 
@@ -100,17 +103,18 @@ function likeClickHandler() {
 	if (numOfLikesRetrieved > likesLimit) {			
 		chrome.runtime.sendMessage({message: "stopLikeRequest"}, function(response) {
 	  		console.log(response.requestBlocked);
-		});	
+		});
+		numOfLikesRetrieved -= 1;	
 	} else { 
 		if (numOfLikesRetrieved === likesLimit) { 
 			alert("you reached the likes limit for today"); 				
 		}			
 		//chrome.storage.local.set({'likesGiven': numOfLikes, 'likesGivenDate': today});
 		var key = today + "";
-		//var key = "2015-07-21";
+		//var key = "2015-07-20";
 		var obj = {};
 		obj[key] = {'likesGiven': numOfLikesRetrieved, 'timeSpent': newTime};
-		chrome.storage.local.set(obj);	    
+		chrome.storage.local.set(obj);   
 		document.getElementById('lg_value').innerHTML = numOfLikesRetrieved; // update the likes given UI
 	}
 	console.log("num of likes: " + numOfLikesRetrieved);
@@ -158,10 +162,9 @@ function startTimer() {
 
 				document.getElementById("ts_value").innerHTML = newTime;
 				var key = today + "";
-				//var key = "2015-07-21";
-				var obj = {};
-				var likes = parseInt(document.getElementById('lg_value').innerHTML);
-				obj[key] = {'likesGiven': likes, 'timeSpent': newTime};
+				//var key = "2015-07-20";
+				var obj = {};				
+				obj[key] = {'likesGiven': numOfLikesRetrieved, 'timeSpent': newTime};
 				chrome.storage.local.set(obj);	   
 		    } else {
 				console.log("is not active");

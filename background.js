@@ -23,8 +23,8 @@ chrome.runtime.onMessage.addListener(
 	else if (request.message == "is_facebookTabActive") {
 		var isActiveValue;
 		chrome.tabs.query({'active': true, 'windowId': chrome.windows.WINDOW_ID_CURRENT}, function(tabs){
-			console.log("tabs: " + JSON.stringify(tabs));
-			console.log("tab0 " + JSON.stringify(tabs[0]));
+			//console.log("tabs: " + JSON.stringify(tabs));
+			//console.log("tab0 " + JSON.stringify(tabs[0]));
             if(tabs[0] && (tabs[0].url).indexOf("www.facebook.com") > -1) {
                 isActiveValue = true; //in focus (selected)
 				sendResponse({isActive: isActiveValue});

@@ -1,4 +1,5 @@
 .box_stats {
+	z-index: 30;
 	background-color: rgb(69, 97, 157);
 	color: white;
 	position: fixed;

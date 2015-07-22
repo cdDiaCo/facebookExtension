@@ -1,14 +1,16 @@
 
 console.log("in main............");
 
-var today = getCurrentDate();
+var today = new Date();
+var today = getFormattedDate(today);
+console.log("today" + today);
 var likesLimit = 2;
 var numOfLikesRetrieved = 0;
 var timeSpentRetrieved = 0;
 var newTime;
 var totalSecondsRetrieved = 0;
-var key = today + "";
-//var key = "2015-07-20";
+var key = today;
+//var key = "2015-07-25";
 
 chrome.storage.local.get(key, function(result){	
 	retrievedContent = result[key];
@@ -16,11 +18,23 @@ chrome.storage.local.get(key, function(result){
 	
 	if(typeof retrievedContent !== 'undefined') {		
 		numOfLikesRetrieved = parseInt(retrievedContent.likesGiven);
-		timeSpentRetrieved = retrievedContent.timeSpent;
+		timeSpentRetrieved = retrievedContent.timeSpent;		
 
-		chrome.storage.local.remove("2015-07-20");
-		//chrome.storage.local.clear();
-	}
+	} else { // there are no records in storage for this day
+		// get the data for the last seven days, then clear the storage
+		// save back the useful data 
+
+		var lastSevenDaysArray = getLastSevenDays();
+		chrome.storage.local.get(lastSevenDaysArray, function(result) {			
+			chrome.storage.local.clear();
+			for (day in result) {
+				//console.log("jjjj " + JSON.stringify(result[day]));
+				var obj = {};
+				obj[day] = result[day];
+				chrome.storage.local.set(obj);	
+			}
+		});		
+	}	
 
 	// if there is a valid timeSpentRetrieved start the timer from this value 
 	if(timeSpentRetrieved) {
@@ -33,6 +47,7 @@ chrome.storage.local.get(key, function(result){
 		});	
 	}		
 });
+
 
 document.addEventListener('DOMContentLoaded', function () {  
 	// overlay the div that shows the likes given by user, the time spent
@@ -111,7 +126,7 @@ function likeClickHandler() {
 		}			
 		//chrome.storage.local.set({'likesGiven': numOfLikes, 'likesGivenDate': today});
 		var key = today + "";
-		//var key = "2015-07-20";
+		//var key = "2015-07-25";
 		var obj = {};
 		obj[key] = {'likesGiven': numOfLikesRetrieved, 'timeSpent': newTime};
 		chrome.storage.local.set(obj);   
@@ -121,11 +136,10 @@ function likeClickHandler() {
 }
 
 
-function getCurrentDate() {
-	var today = new Date();
-	var dd = today.getDate();
-	var mm = today.getMonth()+1; //January is 0!
-	var yyyy = today.getFullYear();
+function getFormattedDate(dateToFormat) {	
+	var dd = dateToFormat.getDate();
+	var mm = dateToFormat.getMonth()+1; //January is 0!
+	var yyyy = dateToFormat.getFullYear();
 
 	if(dd<10) {
 		dd='0'+dd
@@ -136,8 +150,8 @@ function getCurrentDate() {
 	} 
 
 	//today = mm+'/'+dd+'/'+yyyy;
-	today = yyyy + '-' + mm + '-' + dd;
-	return today;
+	formattedDate = yyyy + '-' + mm + '-' + dd;
+	return formattedDate;
 }
 
 
@@ -148,7 +162,7 @@ function startTimer() {
 	function addSecond() {	
 		// check if facebook tab is active
 		chrome.runtime.sendMessage({message: "is_facebookTabActive"}, function(response) {
-			console.log(JSON.stringify(response));
+			//console.log(JSON.stringify(response));
 		    if(response.isActive) {				
 		        seconds++;
 				var secs = seconds;	
@@ -162,16 +176,15 @@ function startTimer() {
 
 				document.getElementById("ts_value").innerHTML = newTime;
 				var key = today + "";
-				//var key = "2015-07-20";
+				//var key = "2015-07-25";
 				var obj = {};				
 				obj[key] = {'likesGiven': numOfLikesRetrieved, 'timeSpent': newTime};
 				chrome.storage.local.set(obj);	   
 		    } else {
-				console.log("is not active");
+				//console.log("is not active");
 		        //not in focus
 		    }
-    	});	
-		 
+    	});			 
 	}
 }
 
@@ -182,10 +195,20 @@ function stringToSeconds(timeString) {
 	var minutes = parseInt(res[1]) * 60;
 	var seconds = parseInt(res[2]);
 	var totalSeconds = hours + minutes + seconds;	 
-	//console.log("hours " + hours + "minutes " + minutes + "seconds " + seconds);
+	
 	return totalSeconds;
-
 }
 
+function getLastSevenDays() {		
+	var lastSevenDaysArray = [];
 
+	for (var i=7; i>0; i--) {
+		var d = new Date(); // current date
+		d.setDate(d.getDate() - i);
+		var day = getFormattedDate(d);
+		lastSevenDaysArray.push(day);
+	}
+
+	return lastSevenDaysArray;
+}
 

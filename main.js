@@ -69,13 +69,26 @@ document.addEventListener('DOMContentLoaded', function () {
 	timeSpentValue.innerHTML = timeSpentRetrieved;
 	var timeText = document.createTextNode("Time spent: ");
 
-	var br = document.createElement("br");
+	var firstBr = document.createElement("br");
+	var secBr = document.createElement("br");
+
+	var optionsSpan = document.createElement("span");
+	var optionsLink = document.createElement("a");
+	optionsLink.id = "opLink_id";
+	var optionsText = document.createTextNode("Options");
+	optionsLink.appendChild(optionsText);
+	optionsLink.title = "Click here for options settings";
+	optionsLink.href = "_blank";	
+	optionsSpan.appendChild(optionsLink);
+	div.appendChild(optionsSpan);
+	div.appendChild(firstBr);
+
 
 	timeSpent.appendChild(timeText);
 	timeSpent.appendChild(timeSpentValue);
 	div.appendChild(timeSpent);
 
-	div.appendChild(br);
+	div.appendChild(secBr);
 
 	likesGiven.appendChild(likesText);
 	likesGiven.appendChild(likesGivenValue);

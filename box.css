@@ -5,10 +5,14 @@
 	position: fixed;
 	left: 0;
 	bottom: 0;
-	height: 40px;
+	height: 50px;
 	width: 120px;
 	border-right: 1px solid #133783;
 	border-top: 1px solid #133783;
 	box-shadow: 1px -1px 1px rgba(0, 0, 0, .52);
 
+}
+
+#opLink_id {
+	color: white;	
 }

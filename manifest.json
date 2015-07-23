@@ -19,6 +19,11 @@
    		}
    ],
 
+  "options_ui": {
+		"page": "options.html",
+		"chrome_style": true
+	},
+
   "permissions": [    
     "webRequest",
     "webRequestBlocking",
@@ -28,7 +33,8 @@
   ],
 
 	"web_accessible_resources": [
-		"box.html"		
+		"box.html",
+		"options.html"		
 	  ]
 
 }

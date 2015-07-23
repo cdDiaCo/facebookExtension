@@ -4,7 +4,7 @@ console.log("in main............");
 var today = new Date();
 var today = getFormattedDate(today);
 console.log("today" + today);
-var likesLimit = 2;
+var likesLimit = 8;
 var numOfLikesRetrieved = 0;
 var timeSpentRetrieved = 0;
 var newTime;
@@ -73,12 +73,13 @@ document.addEventListener('DOMContentLoaded', function () {
 	var secBr = document.createElement("br");
 
 	var optionsSpan = document.createElement("span");
-	var optionsLink = document.createElement("a");
+	var optionsLink = document.createElement("a");	
+	optionsLink.addEventListener("click", optionsLinkHandler);
 	optionsLink.id = "opLink_id";
 	var optionsText = document.createTextNode("Options");
 	optionsLink.appendChild(optionsText);
 	optionsLink.title = "Click here for options settings";
-	optionsLink.href = "_blank";	
+	   
 	optionsSpan.appendChild(optionsLink);
 	div.appendChild(optionsSpan);
 	div.appendChild(firstBr);
@@ -221,7 +222,18 @@ function getLastSevenDays() {
 		var day = getFormattedDate(d);
 		lastSevenDaysArray.push(day);
 	}
-
 	return lastSevenDaysArray;
 }
+
+
+function optionsLinkHandler() {	
+	if (chrome.runtime.openOptionsPage) {
+   		// New way to open options pages, if supported (Chrome 42+).
+    	chrome.runtime.openOptionsPage();
+  	} else {
+    	// Reasonable fallback.
+    	window.open(chrome.runtime.getURL('options.html'));
+  	}
+}
+
 

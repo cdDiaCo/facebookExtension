@@ -33,16 +33,9 @@ chrome.runtime.onMessage.addListener(
 				sendResponse({isActive: isActiveValue});
             }
 
-        });
-		//sendResponse({isActive: isActiveValue});
+        });		
 		return true;
 	}
-
   });
-
-
-
-
-
 
 

@@ -4,7 +4,7 @@ console.log("in main............");
 var today = new Date();
 var today = getFormattedDate(today);
 console.log("today" + today);
-var likesLimit = 8;
+var likesLimit;
 var numOfLikesRetrieved = 0;
 var timeSpentRetrieved = 0;
 var newTime;
@@ -48,6 +48,12 @@ chrome.storage.local.get(key, function(result){
 	}		
 });
 
+
+chrome.storage.local.get("likesLimit", function(result){
+	if(result['likesLimit']) {
+		likesLimit = result['likesLimit'];
+	}
+});
 
 document.addEventListener('DOMContentLoaded', function () {  
 	// overlay the div that shows the likes given by user, the time spent
@@ -236,4 +242,20 @@ function optionsLinkHandler() {
   	}
 }
 
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+		console.log("in onchange listener");
+        for (key in changes) {
+		      var storageChange = changes[key];
+			  if (key === "likesLimit") {
+				  document.getElementById("likes_limit").innerHTML = " / " + storageChange.newValue;
+				  likesLimit = storageChange.newValue;	
+/*				  console.log('Storage key "%s" in namespace "%s" changed. ' +
+				              'Old value was "%s", new value is "%s".',
+				              key,
+				              namespace,
+				              JSON.stringify(storageChange.oldValue),
+				              JSON.stringify(storageChange.newValue)); */
+			  }
+	    }
+});
 

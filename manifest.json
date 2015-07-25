@@ -1,8 +1,10 @@
 {
   "manifest_version": 2,
 
-  "name": "facebook extension",
+  "name": "Facebook Stats Monitor",
   "version": "1.0",
+
+   "description": "Chrome extension that records the number of likes and the time spent on facebook",	
 
   "background": {
 		"scripts": ["background.js"]

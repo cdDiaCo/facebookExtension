@@ -82,51 +82,7 @@ chrome.storage.local.get([timeSpentKey, likesGivenKey], function(result) {
 
 document.addEventListener('DOMContentLoaded', function () {  
 	// overlay the div that shows the likes given by user, the time spent
-	var div = document.createElement("div");
-	div.className = "box_stats"; 
-
-	var likesGiven = document.createElement("span");
-	var likesGivenValue = document.createElement("span");
-	likesGivenValue.id = "lg_value";
-    likesGivenValue.innerHTML = numOfLikesRetrieved;
-	likesLimitValue = document.createElement("span");	
-	likesLimitValue.id = "likes_limit";
-	likesLimitValue.innerHTML = " / " + likesLimit;
-	var likesText = document.createTextNode(" Likes given: ");
-
-	var timeSpent = document.createElement("span");
-	var timeSpentValue = document.createElement("span");
-	timeSpentValue.id = "ts_value";
-	timeSpentValue.innerHTML = timeSpentRetrieved;
-	var timeText = document.createTextNode("Time spent: ");
-
-	var firstBr = document.createElement("br");
-	var secBr = document.createElement("br");
-
-	var optionsSpan = document.createElement("span");
-	var optionsLink = document.createElement("a");	
-	optionsLink.addEventListener("click", optionsLinkHandler);
-	optionsLink.id = "opLink_id";
-	var optionsText = document.createTextNode("Options");
-	optionsLink.appendChild(optionsText);
-	optionsLink.title = "Click here for options settings";
-	   
-	optionsSpan.appendChild(optionsLink);
-	div.appendChild(optionsSpan);
-	div.appendChild(firstBr);
-
-
-	timeSpent.appendChild(timeText);
-	timeSpent.appendChild(timeSpentValue);
-	div.appendChild(timeSpent);
-
-	div.appendChild(secBr);
-
-	likesGiven.appendChild(likesText);
-	likesGiven.appendChild(likesGivenValue);
-	likesGiven.appendChild(likesLimitValue);
-	div.appendChild(likesGiven);	
-	document.body.appendChild(div);		
+	overlayUIBox();
 
 	startTimer();
 	window.addEventListener('scroll', onScrollHandler);	
@@ -288,5 +244,50 @@ function optionsLinkHandler() {
   	}
 }
 
+function overlayUIBox() {
+	var div = document.createElement("div");
+	div.className = "box_stats"; 
 
+	var likesGiven = document.createElement("span");
+	var likesGivenValue = document.createElement("span");
+	likesGivenValue.id = "lg_value";
+    likesGivenValue.innerHTML = numOfLikesRetrieved;
+	likesLimitValue = document.createElement("span");	
+	likesLimitValue.id = "likes_limit";
+	likesLimitValue.innerHTML = " / " + likesLimit;
+	var likesText = document.createTextNode(" Likes given: ");
+
+	var timeSpent = document.createElement("span");
+	var timeSpentValue = document.createElement("span");
+	timeSpentValue.id = "ts_value";
+	timeSpentValue.innerHTML = timeSpentRetrieved;
+	var timeText = document.createTextNode("Time spent: ");
+
+	var firstBr = document.createElement("br");
+	var secBr = document.createElement("br");
+
+	var optionsSpan = document.createElement("span");
+	var optionsLink = document.createElement("a");	
+	optionsLink.addEventListener("click", optionsLinkHandler);
+	optionsLink.id = "opLink_id";
+	var optionsText = document.createTextNode("Options");
+	optionsLink.appendChild(optionsText);
+	optionsLink.title = "Click here for options settings";
+	   
+	optionsSpan.appendChild(optionsLink);
+	div.appendChild(optionsSpan);
+	div.appendChild(firstBr);
+
+
+	timeSpent.appendChild(timeText);
+	timeSpent.appendChild(timeSpentValue);
+	div.appendChild(timeSpent);
+	div.appendChild(secBr);
+
+	likesGiven.appendChild(likesText);
+	likesGiven.appendChild(likesGivenValue);
+	likesGiven.appendChild(likesLimitValue);
+	div.appendChild(likesGiven);	
+	document.body.appendChild(div);		
+}
 

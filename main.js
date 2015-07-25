@@ -1,39 +1,71 @@
 
-console.log("in main............");
-
 var today = new Date();
 var today = getFormattedDate(today);
-console.log("today" + today);
-var likesLimit;
+var likesLimit = 10;
 var numOfLikesRetrieved = 0;
 var timeSpentRetrieved = 0;
-var newTime;
 var totalSecondsRetrieved = 0;
-var key = today;
+var timeSpentKey = today + "_timeSpent";
+var likesGivenKey = today + "_likesGiven";	
 //var key = "2015-07-25";
 
-chrome.storage.local.get(key, function(result){	
-	retrievedContent = result[key];
-	console.log(result[key]);
+chrome.storage.local.get("likesLimit", function(result){
+	if(result['likesLimit']) {
+		likesLimit = result['likesLimit'];  
+	}
+});
+
+chrome.storage.local.get([timeSpentKey, likesGivenKey], function(result) {	
+	console.log(result);
 	
-	if(typeof retrievedContent !== 'undefined') {		
-		numOfLikesRetrieved = parseInt(retrievedContent.likesGiven);
-		timeSpentRetrieved = retrievedContent.timeSpent;		
+	if(result) {
+		if(typeof result[timeSpentKey] !== 'undefined') {				
+			timeSpentRetrieved = result[timeSpentKey];		
+		}
+		if(typeof result[likesGivenKey] !== 'undefined') {
+			numOfLikesRetrieved = parseInt(result[likesGivenKey]);	
+		}
 
 	} else { // there are no records in storage for this day
 		// get the data for the last seven days, then clear the storage
 		// save back the useful data 
 
 		var lastSevenDaysArray = getLastSevenDays();
-		chrome.storage.local.get(lastSevenDaysArray, function(result) {			
-			chrome.storage.local.clear();
-			for (day in result) {
-				//console.log("jjjj " + JSON.stringify(result[day]));
-				var obj = {};
-				obj[day] = result[day];
-				chrome.storage.local.set(obj);	
-			}
-		});		
+		var timeSpentKeys = [];
+		var likesGivenKeys = [];
+		for (var i = 0; i<lastSevenDaysArray.length; i++) {
+			timeSpentKeys.push(lastSevenDaysArray[i] + "_timeSpent");
+			likesGivenKeys.push(lastSevenDaysArray[i] + "_likesGiven");
+		}
+		
+		var resultTimeSpent;
+		// get timeSpent records
+		chrome.storage.local.get(timeSpentKeys, function(result) {	
+			resultTimeSpent = result;
+		});
+
+		var resultLikesGiven;
+		chrome.storage.local.get(likesGivenKeys, function(result) {
+			resultLikesGiven = result;
+		});
+				
+		chrome.storage.local.clear();
+
+		for (day in resultTimeSpent) {
+			//console.log("jjjj " + JSON.stringify(result[day]));
+			var obj = {};
+			obj[day] = resultTimeSpent[day];
+			chrome.storage.local.set(obj);	
+		}
+	
+		for (day in resultLikesGiven) {
+			//console.log("jjjj " + JSON.stringify(result[day]));
+			var obj = {};
+			obj[day] = resultLikesGiven[day];
+			chrome.storage.local.set(obj);	
+		}
+
+		chrome.storage.local.set({"likesLimit" : likesLimit});				
 	}	
 
 	// if there is a valid timeSpentRetrieved start the timer from this value 
@@ -46,13 +78,6 @@ chrome.storage.local.get(key, function(result){
   			//console.log(response.requestBlocked);
 		});	
 	}		
-});
-
-
-chrome.storage.local.get("likesLimit", function(result){
-	if(result['likesLimit']) {
-		likesLimit = result['likesLimit'];
-	}
 });
 
 document.addEventListener('DOMContentLoaded', function () {  
@@ -105,6 +130,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	startTimer();
 	window.addEventListener('scroll', onScrollHandler);	
+
+	// add this onChanged listener here for the cases when the user opens a new facebook tab
+	chrome.storage.onChanged.addListener(function(changes, namespace) {		
+		    for (key in changes) {
+				  var storageChange = changes[key];
+				  if (key === "likesLimit") {
+					  document.getElementById("likes_limit").innerHTML = " / " + storageChange.newValue;
+					  likesLimit = parseInt(storageChange.newValue);	
+	/*				  console.log('Storage key "%s" in namespace "%s" changed. ' +
+						          'Old value was "%s", new value is "%s".',
+						          key,
+						          namespace,
+						          JSON.stringify(storageChange.oldValue),
+						          JSON.stringify(storageChange.newValue)); */
+				  } else if (key === likesGivenKey) {				 				 
+			 	 		document.getElementById('lg_value').innerHTML = storageChange.newValue; 	
+				  } else if (key === timeSpentKey) {
+						//document.getElementById("ts_value").innerHTML = storageChange.newValue;
+					
+				  }
+			}
+	});
+
 });
 
 
@@ -144,13 +192,12 @@ function likeClickHandler() {
 		if (numOfLikesRetrieved === likesLimit) { 
 			alert("you reached the likes limit for today"); 				
 		}			
-		//chrome.storage.local.set({'likesGiven': numOfLikes, 'likesGivenDate': today});
-		var key = today + "";
+		
+		var key = today + "_likesGiven";
 		//var key = "2015-07-25";
 		var obj = {};
-		obj[key] = {'likesGiven': numOfLikesRetrieved, 'timeSpent': newTime};
-		chrome.storage.local.set(obj);   
-		document.getElementById('lg_value').innerHTML = numOfLikesRetrieved; // update the likes given UI
+		obj[key] = numOfLikesRetrieved;		
+		chrome.storage.local.set(obj);   		
 	}
 	console.log("num of likes: " + numOfLikesRetrieved);
 }
@@ -190,20 +237,19 @@ function startTimer() {
 				secs %= 3600;
 				minutes = Math.floor(secs/60);
 				secs %= 60;
-				newTime = ( hours < 10 ? "0" : "" ) + hours + ":" 
+				var newTime = ( hours < 10 ? "0" : "" ) + hours + ":" 
 							+ ( minutes < 10 ? "0" : "" ) + minutes + ":" 
 							+ (secs < 10 ? "0" : "") + secs;	
-
 				document.getElementById("ts_value").innerHTML = newTime;
-				var key = today + "";
-				//var key = "2015-07-25";
-				var obj = {};				
-				obj[key] = {'likesGiven': numOfLikesRetrieved, 'timeSpent': newTime};
-				chrome.storage.local.set(obj);	   
-		    } else {
-				//console.log("is not active");
-		        //not in focus
-		    }
+
+				if ((seconds % 2) === 0) { //save the time once at every 2 seconds 
+					var key = today + "_timeSpent";
+					//var key = "2015-07-25";
+					var obj = {};	
+					obj[key] = newTime;						
+					chrome.storage.local.set(obj);	
+				}   
+		    } 
     	});			 
 	}
 }
@@ -242,20 +288,5 @@ function optionsLinkHandler() {
   	}
 }
 
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-		console.log("in onchange listener");
-        for (key in changes) {
-		      var storageChange = changes[key];
-			  if (key === "likesLimit") {
-				  document.getElementById("likes_limit").innerHTML = " / " + storageChange.newValue;
-				  likesLimit = storageChange.newValue;	
-/*				  console.log('Storage key "%s" in namespace "%s" changed. ' +
-				              'Old value was "%s", new value is "%s".',
-				              key,
-				              namespace,
-				              JSON.stringify(storageChange.oldValue),
-				              JSON.stringify(storageChange.newValue)); */
-			  }
-	    }
-});
+
 

@@ -51,15 +51,13 @@ chrome.storage.local.get([timeSpentKey, likesGivenKey], function(result) {
 				
 		chrome.storage.local.clear();
 
-		for (day in resultTimeSpent) {
-			//console.log("jjjj " + JSON.stringify(result[day]));
+		for (day in resultTimeSpent) {			
 			var obj = {};
 			obj[day] = resultTimeSpent[day];
 			chrome.storage.local.set(obj);	
 		}
 	
-		for (day in resultLikesGiven) {
-			//console.log("jjjj " + JSON.stringify(result[day]));
+		for (day in resultLikesGiven) {			
 			var obj = {};
 			obj[day] = resultLikesGiven[day];
 			chrome.storage.local.set(obj);	
@@ -72,12 +70,6 @@ chrome.storage.local.get([timeSpentKey, likesGivenKey], function(result) {
 	if(timeSpentRetrieved) {
 		totalSecondsRetrieved = stringToSeconds(timeSpentRetrieved);
 	}
-
-	if(numOfLikesRetrieved === likesLimit) {
-		chrome.runtime.sendMessage({message: "stopLikeRequest"}, function(response) {
-  			//console.log(response.requestBlocked);
-		});	
-	}		
 });
 
 document.addEventListener('DOMContentLoaded', function () {  
@@ -93,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				  var storageChange = changes[key];
 				  if (key === "likesLimit") {
 					  document.getElementById("likes_limit").innerHTML = " / " + storageChange.newValue;
-					  likesLimit = parseInt(storageChange.newValue);	
+					  likesLimit = parseInt(storageChange.newValue); 
 	/*				  console.log('Storage key "%s" in namespace "%s" changed. ' +
 						          'Old value was "%s", new value is "%s".',
 						          key,
@@ -102,13 +94,9 @@ document.addEventListener('DOMContentLoaded', function () {
 						          JSON.stringify(storageChange.newValue)); */
 				  } else if (key === likesGivenKey) {				 				 
 			 	 		document.getElementById('lg_value').innerHTML = storageChange.newValue; 	
-				  } else if (key === timeSpentKey) {
-						//document.getElementById("ts_value").innerHTML = storageChange.newValue;
-					
-				  }
+				  } 
 			}
 	});
-
 });
 
 
@@ -135,29 +123,30 @@ function onScrollHandler() {
 
 
 function likeClickHandler() {		
-	numOfLikesRetrieved += 1;
+	numOfLikesRetrieved += 1;	
 
 	// check if likesLimit is reached
 	// if this is the case notify the user and stop any other possible likes 				 
 	if (numOfLikesRetrieved > likesLimit) {			
 		chrome.runtime.sendMessage({message: "stopLikeRequest"}, function(response) {
-	  		console.log(response.requestBlocked);
+	  		//console.log(response.requestBlocked);
+			chrome.runtime.sendMessage({message: "removeListener"}, function(response){
+				//console.log(response.removed);
+			});
 		});
-		numOfLikesRetrieved -= 1;	
+		numOfLikesRetrieved -= 1;			
 	} else { 
 		if (numOfLikesRetrieved === likesLimit) { 
-			alert("you reached the likes limit for today"); 				
-		}			
+			alert("you reached the likes limit for today"); 							
+		}				
 		
 		var key = today + "_likesGiven";
 		//var key = "2015-07-25";
 		var obj = {};
 		obj[key] = numOfLikesRetrieved;		
 		chrome.storage.local.set(obj);   		
-	}
-	console.log("num of likes: " + numOfLikesRetrieved);
+	}	
 }
-
 
 function getFormattedDate(dateToFormat) {	
 	var dd = dateToFormat.getDate();

@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "Facebook Stats Monitor",
-  "version": "1.0",
+  "version": "1.1",
 
    "description": "Chrome extension that records the number of likes and the time spent on facebook",	
 

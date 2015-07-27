@@ -2,24 +2,29 @@ console.log("in background............");
 
 //listen for messages from main.js
 
+var blockLikes = function() {		
+		return {cancel: true};  
+}; 
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {    
-    if (request.message == "stopLikeRequest") {
+    if (request.message == "stopLikeRequest") {			
 		chrome.webRequest.onBeforeRequest.addListener( 	
-			function(info) {
-				//console.log("onbeforereq");
-				//console.log("onBeforeRequest: " + JSON.stringify(info.requestBody.raw[0].bytes) );  
-				return {cancel: true};  
-			},
+			blockLikes,
 			// filters
 			{
 			urls: ['*://www.facebook.com/ufi/like/']   
 			},
 			// extraInfoSpec
-			["blocking", "requestBody"]
-		);
+			//["blocking", "requestBody"]
+			["blocking"]
+		);		
         sendResponse({requestBlocked: "done"});
 	}
+	else if (request.message == "removeListener") {
+		chrome.webRequest.onBeforeRequest.removeListener(blockLikes);
+		sendResponse({removed: "listener removed"});
+	}	
 	else if (request.message == "is_facebookTabActive") {
 		var isActiveValue;
 		chrome.tabs.query({'active': true, 'windowId': chrome.windows.WINDOW_ID_CURRENT}, function(tabs){

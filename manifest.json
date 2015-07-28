@@ -34,9 +34,9 @@
 	"tabs"  
   ],
 
-	"web_accessible_resources": [
-		"box.html",
-		"options.html"		
+	"web_accessible_resources": [		
+		"options.html",
+		"icons/settingsIcon-17.png"			
 	  ]
 
 }

@@ -238,6 +238,7 @@ function overlayUIBox() {
 	div.className = "box_stats"; 
 
 	var likesGiven = document.createElement("span");
+	likesGiven.id = "likesGiven_span";
 	var likesGivenValue = document.createElement("span");
 	likesGivenValue.id = "lg_value";
     likesGivenValue.innerHTML = numOfLikesRetrieved;
@@ -247,31 +248,24 @@ function overlayUIBox() {
 	var likesText = document.createTextNode(" Likes given: ");
 
 	var timeSpent = document.createElement("span");
+	timeSpent.id = "timeSpent_span";
 	var timeSpentValue = document.createElement("span");
 	timeSpentValue.id = "ts_value";
 	timeSpentValue.innerHTML = timeSpentRetrieved;
-	var timeText = document.createTextNode("Time spent: ");
-
-	var firstBr = document.createElement("br");
-	var secBr = document.createElement("br");
+	var timeText = document.createTextNode("Time spent: ");	
 
 	var optionsSpan = document.createElement("span");
-	var optionsLink = document.createElement("a");	
-	optionsLink.addEventListener("click", optionsLinkHandler);
-	optionsLink.id = "opLink_id";
-	var optionsText = document.createTextNode("Options");
-	optionsLink.appendChild(optionsText);
-	optionsLink.title = "Click here for options settings";
-	   
-	optionsSpan.appendChild(optionsLink);
-	div.appendChild(optionsSpan);
-	div.appendChild(firstBr);
-
+	var imgPath =  chrome.extension.getURL('icons/settingsIcon-17.png');
+	var optionsImg = document.createElement("img");
+	optionsImg.setAttribute('src', imgPath);
+	optionsImg.setAttribute('title', 'Options settings');
+	optionsImg.id = "opImg_id";
+	optionsImg.addEventListener("click", optionsLinkHandler);	
+	div.appendChild(optionsImg);
 
 	timeSpent.appendChild(timeText);
 	timeSpent.appendChild(timeSpentValue);
-	div.appendChild(timeSpent);
-	div.appendChild(secBr);
+	div.appendChild(timeSpent);	
 
 	likesGiven.appendChild(likesText);
 	likesGiven.appendChild(likesGivenValue);
